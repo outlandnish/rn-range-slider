@@ -14,6 +14,7 @@ import {
   PanResponderGestureState,
   View,
   ViewProps,
+  LayoutChangeEvent
 } from 'react-native';
 
 import styles from './styles';
@@ -152,10 +153,10 @@ const Slider: React.FC<SliderProps> = ({
 
   const handleContainerLayout = useWidthLayout(containerWidthRef, updateThumbs);
   const handleThumbLayout = useCallback(
-    ({nativeEvent}) => {
+    (event: LayoutChangeEvent) => {
       const {
         layout: {width},
-      } = nativeEvent;
+      } = event.nativeEvent;
       if (thumbWidth !== width) {
         setThumbWidth(width);
       }
@@ -318,8 +319,10 @@ const Slider: React.FC<SliderProps> = ({
   return (
     <View {...restProps}>
       <View {...labelContainerProps}>
+        <>
         {labelView}
         {notchView}
+        </>
       </View>
       <View onLayout={handleContainerLayout} style={styles.controlsContainer}>
         <View style={railContainerStyles}>

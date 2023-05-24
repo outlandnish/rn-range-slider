@@ -6,7 +6,7 @@ import React, {
   MutableRefObject,
   ReactNode,
 } from 'react';
-import {Animated, I18nManager} from 'react-native';
+import {Animated, I18nManager, LayoutChangeEvent} from 'react-native';
 import {clamp} from './helpers';
 import styles from './styles';
 import FollowerContainer from './LabelContainer';
@@ -68,10 +68,10 @@ export const useWidthLayout = (
   callback?: (width: number) => void,
 ) =>
   useCallback(
-    ({nativeEvent}) => {
+    (event: LayoutChangeEvent) => {
       const {
         layout: {width},
-      } = nativeEvent;
+      } = event.nativeEvent;
       const {current: w} = widthRef;
       if (w !== width) {
         widthRef.current = width;
@@ -109,7 +109,7 @@ export const useThumbFollower = (
   const {current: x} = xRef;
 
   const update = useCallback(
-    (thumbPositionInView, value) => {
+    (thumbPositionInView: number, value: number) => {
       const {current: width} = widthRef;
       const {current: containerWidth} = containerWidthRef;
       const position = thumbPositionInView - width / 2;
@@ -192,10 +192,10 @@ export const useSelectedRail = (
  */
 export const useLabelContainerProps = (floating: boolean) => {
   const [labelContainerHeight, setLabelContainerHeight] = useState(0);
-  const onLayout = useCallback(({nativeEvent}) => {
+  const onLayout = useCallback((event: LayoutChangeEvent) => {
     const {
       layout: {height},
-    } = nativeEvent;
+    } = event.nativeEvent;
     setLabelContainerHeight(height);
   }, []);
 
