@@ -6,7 +6,7 @@ import React, {
   MutableRefObject,
   ReactNode,
 } from 'react';
-import {Animated, I18nManager} from 'react-native';
+import {Animated, I18nManager, LayoutChangeEvent} from 'react-native';
 import {clamp} from './helpers';
 import styles from './styles';
 import FollowerContainer from './LabelContainer';
@@ -32,8 +32,7 @@ export const useLowHigh = (
   step: number,
 ) => {
   const validLowProp = lowProp === undefined ? min : clamp(lowProp, min, max);
-  const validHighProp =
-    highProp === undefined ? max : clamp(highProp, min, max);
+  const validHighProp = highProp === undefined ? max : clamp(highProp, min, max);
   const inPropsRef = useRef({
     low: validLowProp,
     high: validHighProp,
@@ -67,12 +66,12 @@ export const useLowHigh = (
 export const useWidthLayout = (
   widthRef: MutableRefObject<number>,
   callback?: (width: number) => void,
-) => {
-  return useCallback(
-    ({nativeEvent}) => {
+) =>
+  useCallback(
+    (event: LayoutChangeEvent) => {
       const {
         layout: {width},
-      } = nativeEvent;
+      } = event.nativeEvent;
       const {current: w} = widthRef;
       if (w !== width) {
         widthRef.current = width;
@@ -83,7 +82,6 @@ export const useWidthLayout = (
     },
     [callback, widthRef],
   );
-};
 
 /**
  * This hook creates a component which follows the thumb.
@@ -111,7 +109,7 @@ export const useThumbFollower = (
   const {current: x} = xRef;
 
   const update = useCallback(
-    (thumbPositionInView, value) => {
+    (thumbPositionInView: number, value: number) => {
       const {current: width} = widthRef;
       const {current: containerWidth} = containerWidthRef;
       const position = thumbPositionInView - width / 2;
@@ -138,6 +136,8 @@ export const useThumbFollower = (
   const follower = (
     <Animated.View style={[transform, {opacity: isPressed ? 1 : 0}]}>
       <FollowerContainer
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
         onLayout={handleLayout}
         ref={contentContainerRef}
         renderContent={renderContent}
@@ -174,7 +174,8 @@ export const useSelectedRail = (
       disableRange ? containerWidth - thumbWidth - leftValue : rightValue,
     );
   }, [inPropsRef, containerWidthRef, disableRange, thumbWidth, left, right]);
-  const styles = useMemo(
+  // eslint-disable-next-line @typescript-eslint/no-shadow
+  const styles: object = useMemo(
     () => ({
       position: 'absolute',
       left: I18nManager.isRTL ? right : left,
@@ -191,10 +192,10 @@ export const useSelectedRail = (
  */
 export const useLabelContainerProps = (floating: boolean) => {
   const [labelContainerHeight, setLabelContainerHeight] = useState(0);
-  const onLayout = useCallback(({nativeEvent}) => {
+  const onLayout = useCallback((event: LayoutChangeEvent) => {
     const {
       layout: {height},
-    } = nativeEvent;
+    } = event.nativeEvent;
     setLabelContainerHeight(height);
   }, []);
 
